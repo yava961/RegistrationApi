@@ -29,9 +29,10 @@ public class JwtSecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users/create").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/api/users/update/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/users/update/**").fullyAuthenticated()
+                .requestMatchers(HttpMethod.GET, "/api/users/all_users").fullyAuthenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/users/delete/**").fullyAuthenticated()
+                .requestMatchers(HttpMethod.GET, "/**").permitAll()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

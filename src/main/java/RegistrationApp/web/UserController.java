@@ -2,7 +2,6 @@ package RegistrationApp.web;
 
 import RegistrationApp.dto.userDto.NewUserDto;
 import RegistrationApp.dto.userDto.UpdateUserDto;
-import RegistrationApp.dto.userDto.UserDto;
 import RegistrationApp.service.UserService;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,13 +22,13 @@ public class UserController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    @SecurityRequirement(name = "JWT")
     public ResponseEntity createUser(@RequestBody @Validated NewUserDto newUserDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(newUserDto));
     }
 
-    @PutMapping("/update/{userId}")
+    @PutMapping("/update/{id}")
     @ResponseStatus(HttpStatus.CREATED)
+    @SecurityRequirement(name = "jwt")
     public ResponseEntity<UpdateUserDto> updateUser(@PathVariable Long id, @Validated @RequestBody UpdateUserDto updateUserDto) {
         UpdateUserDto updateUserById = userService.updateUserById(id, updateUserDto);
         return ResponseEntity.ok(updateUserById);
@@ -37,6 +36,7 @@ public class UserController {
 
     @GetMapping("/all_users")
     @ResponseStatus(HttpStatus.OK)
+    @SecurityRequirement(name = "jwt")
     public ResponseEntity getAllUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
     }
@@ -49,6 +49,7 @@ public class UserController {
 
     @DeleteMapping("/delete/{userId}")
     @ResponseStatus(HttpStatus.OK)
+    @SecurityRequirement(name = "jwt")
     public ResponseEntity deleteUserById(@PathVariable Long userId) {
         userService.deleteUserById(userId);
         return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"User with id: " + userId + " deleted\"}");

@@ -43,8 +43,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UpdateUserDto updateUserById(Long id, UpdateUserDto updateUserDto){
         User user = userRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
-        return modelMapper.map(userRepo.save(user), UpdateUserDto.class);
+                .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
+        modelMapper.map(updateUserDto, user);
+        User updatedUser = userRepo.save(user);
+        return modelMapper.map(updatedUser, UpdateUserDto.class);
     }
 
     @Override
