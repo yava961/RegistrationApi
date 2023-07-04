@@ -25,6 +25,7 @@ to see all users
 and delete user
 
 Also there is controller to Authenticate
+Here, you will need to enter your login and password, and in response, you will receive a JWT token that is used for authentication.
 This is required for you to have access to manage operations such as: update user, see all users and delete user.
 
 If you are using Postman u can do the same operations by using URL and XML queries
