@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -19,6 +21,6 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
-    private int age;
+    private LocalDate birthDate;
+
 }

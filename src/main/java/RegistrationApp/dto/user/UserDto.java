@@ -1,13 +1,12 @@
-package RegistrationApp.dto.userDto;
+package RegistrationApp.dto.user;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
-public class UpdateUserDto {
+public class UserDto {
 
     @NotBlank(message = "First name is required")
     @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
@@ -21,6 +20,7 @@ public class UpdateUserDto {
     @Email(message = "Invalid email format")
     private String email;
 
-    @Min(1)
-    private int age;
+    @NotNull
+    private LocalDate birthDate;
+
 }

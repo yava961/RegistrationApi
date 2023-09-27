@@ -1,20 +1,19 @@
 package RegistrationApp.service.impl;
 
-import RegistrationApp.dto.userDto.NewUserDto;
-import RegistrationApp.dto.userDto.UpdateUserDto;
-import RegistrationApp.dto.userDto.UserDto;
-import RegistrationApp.dto.userDto.UserInfoDto;
+import RegistrationApp.dto.user.UserDto;
 import RegistrationApp.entity.User;
 import RegistrationApp.exeption.NotFoundException;
 import RegistrationApp.repository.UserRepository;
 import RegistrationApp.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
@@ -22,31 +21,37 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDto createUser(NewUserDto newUserDto) {
-        User user = modelMapper.map(newUserDto, User.class);
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        return modelMapper.map(userRepo.save(user), UserDto.class);
+    public UserDto createUser(UserDto userDto) {
+         Period dateRange = Period.between(userDto.getBirthDate(), LocalDate.now());
+         dateRange.getYears();
+
+        User user = modelMapper.map(userDto, User.class);
+            return modelMapper.map(userRepo.save(user), UserDto.class);
+
+
     }
 
     @Override
-    public List<UserInfoDto> getAllUsers() {
-        var users = (List<User>) userRepo.findAll();
-        return users.stream()
-                .map(user -> modelMapper.map(user, UserInfoDto.class))
-                .collect(Collectors.toList());
+    public Page<UserDto> getAllUsers(String localDateFrom, String localDateTo, Pageable pageable) {
+        Page<User> users = null;
+
+        if (StringUtils.isEmpty(localDateFrom) || StringUtils.isEmpty(localDateTo)){
+             users =  userRepo.findAll(pageable);
+            return users.map(user -> modelMapper.map(user, UserDto.class));
+        }
+        users =  userRepo.findByBirthDateBetween(LocalDate.parse(localDateFrom), LocalDate.parse(localDateTo), pageable);
+        return users.map(user -> modelMapper.map(user, UserDto.class));
     }
 
     @Override
-    public UpdateUserDto updateUserById(Long id, UpdateUserDto updateUserDto){
+    public UserDto updateUserById(Long id, UserDto userDto){
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
-        modelMapper.map(updateUserDto, user);
+        modelMapper.map(user, user);
         User updatedUser = userRepo.save(user);
-        return modelMapper.map(updatedUser, UpdateUserDto.class);
+        return modelMapper.map(updatedUser, UserDto.class);
     }
 
     @Override
@@ -56,11 +61,5 @@ public class UserServiceImpl implements UserService {
         }else {
             throw new NotFoundException("User with this id not found!");
         }
-    }
-
-    @Override
-    public UserDto getUserByEmail(String email) {
-        User user = userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("User with this mail not found!"));
-        return modelMapper.map(user, UserDto.class);
     }
 }

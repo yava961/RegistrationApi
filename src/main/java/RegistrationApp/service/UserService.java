@@ -1,21 +1,22 @@
 package RegistrationApp.service;
 
-import RegistrationApp.dto.userDto.UpdateUserDto;
-import RegistrationApp.dto.userDto.UserDto;
-import RegistrationApp.dto.userDto.UserInfoDto;
-import RegistrationApp.dto.userDto.NewUserDto;
+import RegistrationApp.dto.user.UserDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+
+import java.time.LocalDate;
+
 
 public interface UserService {
 
-    UserDto createUser(NewUserDto newUserDto);
+    UserDto createUser(UserDto userDto);
 
-    List<UserInfoDto> getAllUsers();
 
-    UpdateUserDto updateUserById(Long id, UpdateUserDto updateUserDto);
+    Page<UserDto> getAllUsers(String localDateFrom, String localDateTo, Pageable pageable);
+
+    UserDto updateUserById(Long id, UserDto userDto);
 
     void deleteUserById(Long id);
 
-    UserDto getUserByEmail(String email);
 }
