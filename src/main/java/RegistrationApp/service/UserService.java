@@ -12,7 +12,6 @@ public interface UserService {
 
     UserDto createUser(UserDto userDto);
 
-
     Page<UserDto> getAllUsers(String localDateFrom, String localDateTo, Pageable pageable);
 
     UserDto updateUserById(Long id, UserDto userDto);

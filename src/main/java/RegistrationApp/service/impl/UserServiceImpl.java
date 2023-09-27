@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
@@ -24,41 +23,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-         Period dateRange = Period.between(userDto.getBirthDate(), LocalDate.now());
-         dateRange.getYears();
-
-        User user = modelMapper.map(userDto, User.class);
-            return modelMapper.map(userRepo.save(user), UserDto.class);
-
-
+        var user = modelMapper.map(userDto, User.class);
+        return modelMapper.map(userRepo.save(user), UserDto.class);
     }
 
     @Override
     public Page<UserDto> getAllUsers(String localDateFrom, String localDateTo, Pageable pageable) {
         Page<User> users = null;
 
-        if (StringUtils.isEmpty(localDateFrom) || StringUtils.isEmpty(localDateTo)){
-             users =  userRepo.findAll(pageable);
+        if (StringUtils.isEmpty(localDateFrom) || StringUtils.isEmpty(localDateTo)) {
+            users = userRepo.findAll(pageable);
             return users.map(user -> modelMapper.map(user, UserDto.class));
         }
-        users =  userRepo.findByBirthDateBetween(LocalDate.parse(localDateFrom), LocalDate.parse(localDateTo), pageable);
+        LocalDate from = LocalDate.parse(localDateFrom);
+        LocalDate to = LocalDate.parse(localDateTo);
+        if(from.compareTo(to) >= 0 ){
+            throw new IllegalArgumentException("From date must be less than To date");
+        }
+        users = userRepo.findByBirthDateBetween(from, to, pageable);
         return users.map(user -> modelMapper.map(user, UserDto.class));
     }
 
     @Override
-    public UserDto updateUserById(Long id, UserDto userDto){
-        User user = userRepo.findById(id)
+    public UserDto updateUserById(Long id, UserDto userDto) {
+        var user = userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
-        modelMapper.map(user, user);
-        User updatedUser = userRepo.save(user);
+        user.setEmail(userDto.getEmail());
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setBirthDate(userDto.getBirthDate());
+        var updatedUser = userRepo.save(user);
         return modelMapper.map(updatedUser, UserDto.class);
     }
 
     @Override
     public void deleteUserById(Long id) {
-        if(userRepo.existsById(id)) {
+        if (userRepo.existsById(id)) {
             userRepo.deleteById(id);
-        }else {
+        } else {
             throw new NotFoundException("User with this id not found!");
         }
     }
